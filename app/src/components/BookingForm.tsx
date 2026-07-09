@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { book, navigateToCheckout, BookResultType } from "./bookingDriver";
 import type { SelectedSlot } from "./bookingDriver";
+import CoParticipantSelector, { type CoParticipant } from "./CoParticipantSelector";
 
 // BookingForm.tsx — client:only="react" island. Renders the service's booking
 // form SCHEMA (from @wix/forms, fetched server-side and passed in as `fields`),
@@ -29,6 +30,7 @@ interface Props {
   fields: BookingFormField[];
   onSuccess: (id: string, startDate?: string) => void;
   onCancel: () => void;
+  allowCoParticipant?: boolean;
 }
 
 const friendlyError = (err: any): string => {
@@ -40,8 +42,9 @@ const friendlyError = (err: any): string => {
   return "Something went wrong completing your booking. Please try again.";
 };
 
-export default function BookingForm({ service, serviceName, slot, fields, onSuccess, onCancel }: Props) {
+export default function BookingForm({ service, serviceName, slot, fields, onSuccess, onCancel, allowCoParticipant }: Props) {
   const [values, setValues] = useState<Record<string, string>>({});
+  const [coParticipant, setCoParticipant] = useState<CoParticipant | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -56,11 +59,17 @@ export default function BookingForm({ service, serviceName, slot, fields, onSucc
     e.preventDefault();
     setStatus("submitting"); setError(null);
     try {
+      const submission: Record<string, unknown> = { ...values };
+      if (coParticipant) {
+        submission.co_participant_name = coParticipant.name;
+        submission.co_participant_member_id = coParticipant.memberId;
+      }
       const result = await book({
         service,
         slot,
-        formSubmission: values, // keyed by each field's `target`
+        formSubmission: submission,
         timezone: slot.timezone,
+        totalParticipants: coParticipant ? 2 : 1,
       });
       if (result.type === BookResultType.CheckoutRequired) {
         // Paid: hand the cart to the Wix-hosted checkout; it returns to /booking-confirmation.
@@ -125,6 +134,14 @@ export default function BookingForm({ service, serviceName, slot, fields, onSucc
           )}
         </div>
       ))}
+
+      {allowCoParticipant && (
+        <div className="booking-field">
+          <label className="booking-label">Add a co-participant <span className="booking-optional">(optional)</span></label>
+          <p className="booking-field-hint">Search for another member to join this lesson with you.</p>
+          <CoParticipantSelector selected={coParticipant} onSelect={setCoParticipant} />
+        </div>
+      )}
 
       {error && <p className="booking-error" role="alert">{error}</p>}
 

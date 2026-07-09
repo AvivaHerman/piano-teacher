@@ -24,6 +24,7 @@ interface Props {
   staffMembers?: StaffMemberOption[];
   locations?: LocationOption[];
   locationId?: string;
+  allowCoParticipant?: boolean;
 }
 
 export default function ServiceBookingFlow({
@@ -34,6 +35,7 @@ export default function ServiceBookingFlow({
   staffMembers,
   locations,
   locationId,
+  allowCoParticipant,
 }: Props) {
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlot | null>(null);
 
@@ -66,6 +68,7 @@ export default function ServiceBookingFlow({
       fields={fields}
       onSuccess={handleSuccess}
       onCancel={() => setSelectedSlot(null)}
+      allowCoParticipant={allowCoParticipant}
     />
   );
 }

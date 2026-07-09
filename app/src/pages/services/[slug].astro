@@ -80,6 +80,7 @@ const duration = service.schedule?.availabilityConstraints?.sessionDurations?.[0
 const imageUrl = service.media?.mainMedia?.image?.url ?? service.media?.items?.[0]?.image?.url;
 const serviceName = service.name ?? "Service";
 const staffMembers = service.staffMemberDetails?.staffMembers ?? [];
+const allowCoParticipant = slug === "couples-lesson" || slug === "group-lesson";
 
 let serviceLocations: { _id: string; name?: string }[] = [];
 try {
@@ -127,6 +128,7 @@ try {
         staffMembers={staffMembers}
         locations={serviceLocations}
         locationId={locationId}
+        allowCoParticipant={allowCoParticipant}
         client:only="react"
       />
     </div>

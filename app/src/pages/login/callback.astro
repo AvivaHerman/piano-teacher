@@ -1,0 +1,51 @@
+---
+import { OAuthStrategy } from "@wix/sdk";
+
+const CLIENT_ID = import.meta.env.WIX_CLIENT_ID as string;
+const code = Astro.url.searchParams.get("code") ?? "";
+const state = Astro.url.searchParams.get("state") ?? "";
+const errorParam = Astro.url.searchParams.get("error");
+
+if (errorParam) return Astro.redirect(`/?loginError=${encodeURIComponent(errorParam)}`);
+if (!code || !state) return Astro.redirect("/login?error=missing_params");
+
+const oauthData = Astro.cookies.get("wixOAuthData")?.json();
+if (!oauthData) return Astro.redirect("/login?error=missing_state");
+
+let errorMsg = "";
+try {
+  const auth = OAuthStrategy({ clientId: CLIENT_ID });
+  const tokens = await auth.getMemberTokens(code, state, oauthData);
+
+  Astro.cookies.set("wixSession", { clientId: CLIENT_ID, tokens } as any, {
+    path: "/",
+    secure: true,
+    maxAge: 30 * 24 * 60 * 60,
+    sameSite: "lax",
+  });
+  Astro.cookies.delete("wixOAuthData", { path: "/" });
+  return Astro.redirect("/member");
+} catch (err: any) {
+  errorMsg = err?.message ?? "Token exchange failed";
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | Piano Teacher</title>
+    <style>
+      body { font-family: Inter, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #1a1a2e; color: #fff; margin: 0; }
+      .box { text-align: center; }
+      p { color: #e53e3e; }
+      a { color: #C9A84C; }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <p>Login error: {errorMsg}</p>
+      <a href="/login">Try again</a>
+    </div>
+  </body>
+</html>

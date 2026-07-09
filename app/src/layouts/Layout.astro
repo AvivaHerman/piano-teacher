@@ -1,5 +1,6 @@
 ---
 import "../styles/components-bookings.css";
+import { parseSession, isMember } from "../lib/memberAuth";
 
 interface Props {
   title?: string;
@@ -7,6 +8,8 @@ interface Props {
 }
 const { title = 'Piano Teacher' } = Astro.props;
 const currentPath = Astro.url.pathname;
+const session = parseSession(Astro.cookies.get("wixSession"));
+const loggedIn = isMember(session);
 ---
 
 <!doctype html>
@@ -28,6 +31,14 @@ const currentPath = Astro.url.pathname;
         <a href="/" class:list={[{ active: currentPath === '/' }]}>Home</a>
         <a href="/services" class:list={[{ active: currentPath.startsWith('/services') }]}>Book a Lesson</a>
         <a href="/play" class:list={[{ active: currentPath === '/play' }]}>Play Piano</a>
+        {loggedIn ? (
+          <>
+            <a href="/member" class:list={[{ active: currentPath.startsWith('/member') }]}>My Area</a>
+            <a href="/logout" class="nav-logout">Sign out</a>
+          </>
+        ) : (
+          <a href="/login" class:list={["nav-login", { active: currentPath === '/login' }]}>Sign in</a>
+        )}
       </div>
     </nav>
     <main>
@@ -121,6 +132,20 @@ const currentPath = Astro.url.pathname;
 
   .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
   .nav-links a.active { color: var(--gold); background: rgba(201,168,76,0.12); }
+
+  .nav-login {
+    background: var(--gold);
+    color: var(--ebony) !important;
+    padding: 0.4rem 1rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+  }
+  .nav-login:hover { background: var(--gold-light) !important; }
+
+  .nav-logout {
+    color: #888 !important;
+    font-size: 0.85rem !important;
+  }
 
   footer {
     text-align: center;

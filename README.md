@@ -18,6 +18,12 @@ Live site: **https://piano-teac-06ff0fa8-avivah2.wix-site-host.com**
 - Online payment via Wix-hosted checkout (paid → checkout redirect; free → direct confirmation)
 - Booking confirmation page
 
+### Member Area
+- Students sign in / sign up via Wix-hosted OAuth (PKCE flow)
+- Personal dashboard shows upcoming confirmed bookings
+- For Couples and Group lessons, members can search for and add a co-participant from the site's member list
+- Routes: `/login`, `/login/callback`, `/logout`, `/member`
+
 ### Interactive Piano Game
 - Two-octave keyboard (C4–B5), playable by mouse, touch, or keyboard
 - Web Audio API triangle oscillator with ADSR envelope for piano-like tone
@@ -55,14 +61,22 @@ piano-teacher/
     │   │   │   ├── index.astro         # SSR services listing
     │   │   │   └── [slug].astro        # SSR service detail + booking flow
     │   │   ├── booking-confirmation.astro
+    │   │   ├── login.astro             # OAuth initiation (redirects to Wix login)
+    │   │   ├── login/callback.astro    # OAuth callback (exchanges code for tokens)
+    │   │   ├── logout.astro            # Clears session cookie
+    │   │   ├── member/index.astro      # Member dashboard (bookings + profile)
+    │   │   ├── api/members/search.ts   # Member search API (for co-participant picker)
     │   │   └── play.astro              # Piano game page
     │   ├── components/
     │   │   ├── bookingDriver.ts        # Wix booking sequence (createBooking → cart → checkout)
     │   │   ├── AvailabilityCalendar.tsx # Week calendar, slot picker (APPOINTMENT + CLASS)
     │   │   ├── BookingForm.tsx         # Schema-driven booking form
     │   │   ├── ServiceBookingFlow.tsx  # Step coordinator (calendar → form)
+    │   │   ├── CoParticipantSelector.tsx # Member search + picker for couples/group lessons
     │   │   ├── ServiceCard.astro       # Service listing card
     │   │   └── PianoGame.tsx           # Interactive piano keyboard + songs
+    │   ├── lib/
+    │   │   └── memberAuth.ts           # Session cookie parsing utilities
     │   └── styles/
     │       └── components-bookings.css # Booking component styles (design-token CSS)
     ├── wix.config.json                 # Wix app + site IDs
