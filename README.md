@@ -2,7 +2,7 @@
 
 A Wix Headless site for a piano teacher — built with Astro + React on the Wix platform.
 
-Live site: **https://piano-teac-06ff0fa8-avivah2.wix-site-host.com**
+Live site: **[my piano teacher](https://www.my-piano-teacher.com/)**
 
 ---
 
