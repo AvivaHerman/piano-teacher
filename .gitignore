@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+.nuxt/
+.output/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Wix
+.wix/
+
+# Claude Code (local machine config)
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime / OS
+.cache/
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+
+# Editor
+.vscode/
+.idea/
+*.iml
