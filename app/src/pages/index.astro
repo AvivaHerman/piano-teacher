@@ -86,44 +86,45 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
+  /* ── Hero ─────────────────────────────────────────────────────────────────── */
   .hero {
-    background: linear-gradient(135deg, var(--ebony) 0%, #16213e 60%, #0f3460 100%);
-    min-height: 92vh;
+    min-height: 88vh;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 4rem 6vw;
     gap: 3rem;
+    border-bottom: 1.5px solid rgba(197,212,232,0.8);
     position: relative;
-    overflow: hidden;
   }
 
   .hero-content { max-width: 560px; z-index: 1; }
 
   .badge {
     display: inline-block;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(196,146,56,0.1);
+    border: 1.5px solid rgba(196,146,56,0.35);
     color: var(--gold);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.35rem 0.85rem;
-    border-radius: 99px;
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
     margin-bottom: 1.25rem;
   }
 
   .hero h1 {
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    line-height: 1.1;
-    color: #fff;
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 1.05;
+    color: var(--pencil);
     margin-bottom: 1.25rem;
   }
 
   .hero p {
     font-size: 1.15rem;
-    color: #a0aec0;
+    color: var(--pencil-mid);
     line-height: 1.7;
     margin-bottom: 2rem;
   }
@@ -132,94 +133,122 @@ import Layout from '../layouts/Layout.astro';
 
   .btn {
     display: inline-block;
-    padding: 0.8rem 1.75rem;
-    border-radius: var(--radius);
+    padding: 0.75rem 1.75rem;
+    border-radius: 3px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1rem;
     font-weight: 600;
-    font-size: 0.95rem;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.15s;
     cursor: pointer;
-    border: none;
+    letter-spacing: 0.02em;
   }
 
-  .btn-primary { background: var(--gold); color: var(--ebony); }
-  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-primary {
+    background: var(--pencil);
+    color: var(--paper);
+    border: 2px solid var(--pencil);
+  }
+  .btn-primary:hover { background: var(--pencil-mid); border-color: var(--pencil-mid); }
 
-  .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.3); }
-  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.06); }
+  .btn-outline {
+    background: transparent;
+    color: var(--pencil);
+    border: 2px solid var(--pencil);
+  }
+  .btn-outline:hover { background: rgba(26,21,14,0.05); }
 
-  .btn-secondary { background: var(--ebony); color: #fff; }
-  .btn-secondary:hover { background: #2a2a4a; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--gold);
+    border: 2px solid var(--gold);
+  }
+  .btn-secondary:hover { background: rgba(196,146,56,0.07); }
 
-  /* decorative piano keys in hero */
+  /* sketched piano keys */
   .hero-visual { flex-shrink: 0; }
   .piano-keys {
     position: relative;
     display: flex;
     width: 280px;
     height: 160px;
-    background: var(--ebony);
-    border-radius: 8px;
-    border: 2px solid rgba(255,255,255,0.1);
+    background: var(--paper-card);
+    border-radius: 4px;
+    border: 2px solid var(--pencil);
     overflow: hidden;
     padding: 0 8px;
     align-items: flex-end;
     gap: 3px;
-    opacity: 0.4;
+    opacity: 0.75;
   }
-  .key.white { flex: 1; height: 100%; background: #f5f5e8; border-radius: 0 0 4px 4px; }
+  .key.white {
+    flex: 1; height: 100%;
+    background: var(--paper-card);
+    border-left: 1px solid var(--pencil);
+    border-right: 1px solid var(--pencil);
+    border-radius: 0 0 3px 3px;
+  }
   .blacks { position: absolute; top: 0; left: 0; right: 0; display: flex; padding: 0 20px; gap: 0; }
-  .key.black { width: 24px; height: 96px; background: #111; border-radius: 0 0 4px 4px; flex-shrink: 0; margin: 0 4px; }
+  .key.black {
+    width: 24px; height: 96px;
+    background: var(--pencil);
+    border-radius: 0 0 3px 3px;
+    flex-shrink: 0; margin: 0 4px;
+  }
   .gap { width: 24px; flex-shrink: 0; margin: 0 4px; }
 
-  /* lessons */
+  /* ── Lessons ──────────────────────────────────────────────────────────────── */
   .lessons { padding: 6rem 6vw; }
   .container { max-width: 1100px; margin: 0 auto; }
 
-  .lessons h2, .game-promo h2 { text-align: center; font-size: 2.4rem; margin-bottom: 0.5rem; }
-  .section-subtitle { text-align: center; color: var(--text-muted); font-size: 1.05rem; margin-bottom: 3rem; }
+  .lessons h2, .game-promo h2 { text-align: center; font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.5rem; }
+  .section-subtitle { text-align: center; color: var(--pencil-mid); font-size: 1.05rem; margin-bottom: 3rem; }
 
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
 
   .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    background: var(--paper-card);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
     padding: 2rem;
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    box-shadow: 2px 3px 8px rgba(40,28,16,0.07);
     transition: box-shadow 0.2s, transform 0.2s;
   }
-  .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .card.featured { border-color: var(--gold); box-shadow: 0 4px 24px rgba(201,168,76,0.15); }
+  .card:hover { box-shadow: 4px 5px 14px rgba(40,28,16,0.12); transform: translateY(-2px) rotate(0.2deg); }
+  .card.featured { border-color: var(--gold); border-width: 2px; box-shadow: 3px 4px 12px rgba(196,146,56,0.15); }
 
   .badge-popular {
     position: absolute;
-    top: -12px;
-    left: 50%;
+    top: -12px; left: 50%;
     transform: translateX(-50%);
     background: var(--gold);
-    color: var(--ebony);
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 1rem;
-    border-radius: 99px;
+    color: var(--paper);
+    font-family: 'Patrick Hand', cursive;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.9rem;
+    border-radius: 2px;
     white-space: nowrap;
+    letter-spacing: 0.04em;
   }
 
   .card-icon { font-size: 2.25rem; }
-  .card h3 { font-size: 1.35rem; }
-  .card p { color: var(--text-muted); line-height: 1.6; }
+  .card h3 { font-size: 1.5rem; }
+  .card p { color: var(--pencil-mid); line-height: 1.6; }
   .card ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
-  .card ul li::before { content: '✓ '; color: var(--gold); font-weight: 700; }
-  .card ul li { font-size: 0.9rem; color: var(--text-muted); }
+  .card ul li::before { content: '— '; color: var(--gold); font-weight: 700; }
+  .card ul li { font-size: 0.95rem; color: var(--pencil-mid); }
   .card .btn { margin-top: auto; text-align: center; }
 
-  /* game promo */
+  /* ── Game promo ───────────────────────────────────────────────────────────── */
   .game-promo {
-    background: linear-gradient(135deg, var(--ebony) 0%, #1a2744 100%);
+    background: var(--paper-dark);
+    border-top: 1.5px solid rgba(197,212,232,0.8);
+    border-bottom: 1.5px solid rgba(197,212,232,0.8);
     padding: 5rem 6vw;
   }
 
@@ -233,10 +262,10 @@ import Layout from '../layouts/Layout.astro';
   }
 
   .promo-text { max-width: 540px; }
-  .promo-text h2 { color: #fff; font-size: 2.2rem; margin-bottom: 1rem; }
-  .promo-text p { color: #a0aec0; font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.75rem; }
+  .promo-text h2 { color: var(--pencil); font-size: clamp(1.9rem, 3.5vw, 2.6rem); margin-bottom: 1rem; }
+  .promo-text p { color: var(--pencil-mid); font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.75rem; }
 
-  .promo-keys { font-size: 8rem; opacity: 0.15; flex-shrink: 0; }
+  .promo-keys { font-size: 8rem; opacity: 0.12; flex-shrink: 0; }
 
   @media (max-width: 768px) {
     .hero { flex-direction: column; text-align: center; justify-content: center; padding: 3rem 1.5rem; }
