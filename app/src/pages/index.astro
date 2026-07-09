@@ -14,17 +14,11 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
     <div class="hero-visual" aria-hidden="true">
-      <div class="piano-keys">
-        {Array.from({length: 7}, (_, i) => <div class="key white" />)}
-        <div class="blacks">
-          <div class="key black" />
-          <div class="key black" />
-          <div class="gap" />
-          <div class="key black" />
-          <div class="key black" />
-          <div class="key black" />
-        </div>
-      </div>
+      <img
+        src="https://static.wixstatic.com/media/3cc995_50718d49bf644dbea17598244fdd3438~mv2.jpg"
+        alt="Piano keyboard"
+        class="hero-piano-photo"
+      />
     </div>
   </section>
 
@@ -165,37 +159,23 @@ import Layout from '../layouts/Layout.astro';
   }
   .btn-secondary:hover { background: rgba(196,146,56,0.07); }
 
-  /* sketched piano keys */
+  /* hero piano photo */
   .hero-visual { flex-shrink: 0; }
-  .piano-keys {
-    position: relative;
-    display: flex;
-    width: 280px;
-    height: 160px;
-    background: var(--paper-card);
-    border-radius: 4px;
-    border: 2px solid var(--pencil);
-    overflow: hidden;
-    padding: 0 8px;
-    align-items: flex-end;
-    gap: 3px;
-    opacity: 0.75;
+  .hero-piano-photo {
+    width: 360px;
+    height: 300px;
+    object-fit: cover;
+    object-position: right center;
+    display: block;
+    -webkit-mask-image: radial-gradient(
+      ellipse 82% 88% at 58% 50%,
+      black 28%, rgba(0,0,0,0.6) 55%, transparent 78%
+    );
+    mask-image: radial-gradient(
+      ellipse 82% 88% at 58% 50%,
+      black 28%, rgba(0,0,0,0.6) 55%, transparent 78%
+    );
   }
-  .key.white {
-    flex: 1; height: 100%;
-    background: var(--paper-card);
-    border-left: 1px solid var(--pencil);
-    border-right: 1px solid var(--pencil);
-    border-radius: 0 0 3px 3px;
-  }
-  .blacks { position: absolute; top: 0; left: 0; right: 0; display: flex; padding: 0 20px; gap: 0; }
-  .key.black {
-    width: 24px; height: 96px;
-    background: var(--pencil);
-    border-radius: 0 0 3px 3px;
-    flex-shrink: 0; margin: 0 4px;
-  }
-  .gap { width: 24px; flex-shrink: 0; margin: 0 4px; }
 
   /* ── Lessons ──────────────────────────────────────────────────────────────── */
   .lessons { padding: 6rem 6vw; }
