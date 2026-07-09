@@ -15,7 +15,7 @@ import Layout from '../layouts/Layout.astro';
     </div>
     <div class="hero-visual" aria-hidden="true">
       <img
-        src="https://static.wixstatic.com/media/3cc995_50718d49bf644dbea17598244fdd3438~mv2.jpg"
+        src="https://static.wixstatic.com/media/3cc995_151eabcfe1714fb6867cc0663daeea1b~mv2.jpg"
         alt="Piano keyboard"
         class="hero-piano-photo"
       />
@@ -162,19 +162,20 @@ import Layout from '../layouts/Layout.astro';
   /* hero piano photo */
   .hero-visual { flex-shrink: 0; }
   .hero-piano-photo {
-    width: 360px;
-    height: 300px;
+    width: 420px;
+    height: 280px;
     object-fit: cover;
-    object-position: right center;
+    object-position: center 40%;
     display: block;
-    -webkit-mask-image: radial-gradient(
-      ellipse 82% 88% at 58% 50%,
-      black 28%, rgba(0,0,0,0.6) 55%, transparent 78%
-    );
-    mask-image: radial-gradient(
-      ellipse 82% 88% at 58% 50%,
-      black 28%, rgba(0,0,0,0.6) 55%, transparent 78%
-    );
+    /* Fade dark left/top/bottom edges; right naturally dissolves into bright white */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, black 16%, black 72%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+    mask-image:
+      linear-gradient(to right, transparent 0%, black 16%, black 72%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 
   /* ── Lessons ──────────────────────────────────────────────────────────────── */
