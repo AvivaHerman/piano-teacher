@@ -1,0 +1,207 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ServiceBookingFlow from "../../components/ServiceBookingFlow";
+import { services } from "@wix/bookings";
+import { forms } from "@wix/forms";
+import { auth } from "@wix/essentials";
+
+const BOOKING_APP_ID = "13d21c63-b5ec-5912-8397-c3a5ddb27a97";
+const { slug } = Astro.params;
+
+const reqUrl = new URL(Astro.request.url);
+const locationId = reqUrl.searchParams.get("locationId") ?? undefined;
+
+let service: any = null;
+try {
+  const result = await auth
+    .elevate(services.queryServices)({ conditionalFields: ["STAFF_MEMBER_DETAILS"] })
+    .eq("mainSlug.name", slug)
+    .eq("appId", BOOKING_APP_ID)
+    .limit(1)
+    .find();
+  service = result.items?.[0] ?? null;
+} catch (err) {
+  console.error(`[services/${slug}] detail query failed:`, err);
+}
+
+if (!service) return Astro.redirect("/services", 302);
+
+let formFields: any[] = [];
+try {
+  const formId = service.form?._id;
+  if (formId) {
+    const res: any = await auth.elevate(forms.getForm)(formId);
+    const form = res?.form ?? res;
+    const RENDERABLE = ["TEXT_INPUT", "PHONE_INPUT", "DROPDOWN"];
+    formFields = (form?.formFields ?? [])
+      .filter(
+        (f: any) =>
+          f.fieldType === "INPUT" &&
+          !f.hidden &&
+          RENDERABLE.includes(f.inputOptions?.stringOptions?.componentType),
+      )
+      .map((f: any) => {
+        const opts = f.inputOptions;
+        const str = opts?.stringOptions;
+        const label =
+          str?.textInputOptions?.label ??
+          str?.dropdownOptions?.label ??
+          str?.phoneInputOptions?.label ??
+          "";
+        return {
+          label,
+          target: opts?.target ?? "",
+          required: opts?.required ?? false,
+          componentType: str?.componentType ?? "TEXT_INPUT",
+          identifier: f.identifier ?? "",
+          options: str?.dropdownOptions?.options?.map((o: any) => ({
+            value: o.value ?? o.label ?? "",
+            label: o.label ?? o.value ?? "",
+          })),
+        };
+      });
+  }
+} catch (err) {
+  console.error(`[services/${slug}] booking form schema failed:`, err);
+}
+
+const formatPrice = (p: any): string | undefined => {
+  if (!p || p.rateType === "NO_FEE") return undefined;
+  if (p.rateType === "FIXED" && p.fixed?.price) {
+    const { value, currency } = p.fixed.price;
+    if (!value) return undefined;
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: currency ?? "USD" }).format(Number(value));
+  }
+  return undefined;
+};
+
+const price = formatPrice(service.payment);
+const duration = service.schedule?.availabilityConstraints?.sessionDurations?.[0] ?? 60;
+const imageUrl = service.media?.mainMedia?.image?.url ?? service.media?.items?.[0]?.image?.url;
+const serviceName = service.name ?? "Service";
+const staffMembers = service.staffMemberDetails?.staffMembers ?? [];
+
+let serviceLocations: { _id: string; name?: string }[] = [];
+try {
+  const locResult: any = await auth.elevate(services.queryLocations)();
+  const businessLocations = locResult?.businessLocations?.locations ?? [];
+  const serviceLocationIds = new Set(
+    (service.locations ?? [])
+      .filter((l: any) => (l.type ?? "BUSINESS") === "BUSINESS")
+      .map((l: any) => l.business?._id ?? l._id)
+      .filter(Boolean),
+  );
+  serviceLocations = businessLocations
+    .filter((l: any) => serviceLocationIds.has(l._id))
+    .map((l: any) => ({ _id: l._id, name: l.business?.name ?? "Location" }));
+} catch (err) {
+  console.error(`[services/${slug}] queryLocations failed:`, err);
+}
+---
+
+<Layout title={serviceName} description={service.tagLine ?? service.description}>
+  <section class="service-detail">
+    <a href="/services" class="back-link">← All lessons</a>
+
+    {imageUrl && (
+      <img src={imageUrl} alt={serviceName} class="service-banner" />
+    )}
+
+    <div class="service-info">
+      <h1>{serviceName}</h1>
+      {service.tagLine && <p class="service-tagline">{service.tagLine}</p>}
+      <div class="service-meta">
+        <span>{duration} min</span>
+        {price && <span class="service-price">{price}</span>}
+      </div>
+      {service.description && <p class="service-description">{service.description}</p>}
+    </div>
+
+    <div class="booking-section">
+      <h2>Book this lesson</h2>
+      <ServiceBookingFlow
+        service={service}
+        serviceName={serviceName}
+        serviceType={service.type ?? "APPOINTMENT"}
+        fields={formFields}
+        staffMembers={staffMembers}
+        locations={serviceLocations}
+        locationId={locationId}
+        client:only="react"
+      />
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .service-detail {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--text); }
+
+  .service-banner {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+  }
+
+  .service-info {
+    margin-bottom: 3rem;
+  }
+
+  .service-info h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .service-tagline {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .service-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .service-price {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .service-description {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 1rem;
+  }
+
+  .booking-section {
+    border-top: 1px solid var(--border);
+    padding-top: 2.5rem;
+  }
+
+  .booking-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+</style>

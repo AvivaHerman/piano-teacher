@@ -184,6 +184,7 @@ export default function PianoGame() {
   const [playIndex, setPlayIndex] = useState(-1);
   const [showAddModal, setShowAddModal] = useState(false);
   const playTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const activeNoteRef = useRef<HTMLDivElement>(null);
 
   // Merge built-in + member songs on mount
   useEffect(() => {
@@ -244,6 +245,11 @@ export default function PianoGame() {
   }, []);
 
   useEffect(() => () => stopPlayback(), [stopPlayback]);
+
+  // Auto-scroll the active note pill into view
+  useEffect(() => {
+    activeNoteRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [playIndex]);
 
   // ── member song management ────────────────────────────────────────────────
   function handleAddSong(song: Song) {
@@ -343,15 +349,17 @@ export default function PianoGame() {
         </div>
       </div>
 
-      {/* Progress dots for active song */}
+      {/* Note strip */}
       {selectedSong && (
-        <div className="song-progress">
+        <div className="note-strip">
           {selectedSong.notes.map((n, i) => (
             <div
               key={i}
-              className={`dot ${i === playIndex ? 'active' : ''} ${i < playIndex ? 'done' : ''}`}
-              title={n.note}
-            />
+              ref={i === playIndex ? activeNoteRef : undefined}
+              className={`note-pill ${i === playIndex ? 'note-pill--active' : ''} ${i < playIndex ? 'note-pill--done' : ''}`}
+            >
+              {n.note}
+            </div>
           ))}
         </div>
       )}
@@ -449,16 +457,45 @@ export default function PianoGame() {
         .key-black:hover { background: linear-gradient(to bottom, #333, #1a1a1a); }
         .key-black.pressed { background: linear-gradient(to bottom, #5a3e10, #3d2a0a); }
 
-        /* song progress */
-        .song-progress {
-          display: flex; flex-wrap: wrap; gap: 4px; max-height: 48px; overflow: hidden;
+        /* note strip */
+        .note-strip {
+          display: flex; gap: 5px; overflow-x: auto; padding: 0.5rem 0.25rem;
+          scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+          border: 1px solid var(--border); border-radius: var(--radius);
+          background: var(--bg);
         }
-        .dot {
-          width: 10px; height: 10px; border-radius: 50%;
-          background: var(--border); transition: background 0.1s;
+        .note-strip::-webkit-scrollbar { height: 4px; }
+        .note-strip::-webkit-scrollbar-track { background: transparent; }
+        .note-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .note-pill {
+          flex-shrink: 0;
+          min-width: 38px;
+          padding: 0.3rem 0.5rem;
+          border-radius: 6px;
+          border: 1.5px solid var(--border);
+          background: var(--card-bg);
+          font-size: 0.72rem;
+          font-weight: 700;
+          font-family: monospace;
+          color: var(--text-muted);
+          text-align: center;
+          transition: all 0.12s;
+          user-select: none;
         }
-        .dot.done { background: #a8d5a2; }
-        .dot.active { background: var(--gold); transform: scale(1.4); }
+        .note-pill--done {
+          background: #f0faf0;
+          border-color: #a8d5a2;
+          color: #4a8c4a;
+        }
+        .note-pill--active {
+          background: var(--gold);
+          border-color: var(--gold);
+          color: var(--ebony);
+          transform: scale(1.18);
+          box-shadow: 0 2px 8px rgba(201,168,76,0.45);
+          font-size: 0.8rem;
+        }
 
         /* hint */
         .keyboard-hint { font-size: 0.82rem; color: var(--text-muted); }

@@ -1,0 +1,127 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ServiceCard from "../../components/ServiceCard.astro";
+import { services, categoriesV2 } from "@wix/bookings";
+import { auth } from "@wix/essentials";
+
+const BOOKING_APP_ID = "13d21c63-b5ec-5912-8397-c3a5ddb27a97";
+
+const reqUrl = new URL(Astro.request.url);
+const selectedCategory = reqUrl.searchParams.get("category") ?? "";
+
+const filter: Record<string, any> = { appId: BOOKING_APP_ID };
+if (selectedCategory) filter["category.id"] = { $eq: selectedCategory };
+
+const [servicesResult, catResult] = await Promise.all([
+  auth
+    .elevate(services.queryServices)({ query: { filter, paging: { limit: 100 } }, conditionalFields: ["STAFF_MEMBER_DETAILS"] })
+    .find()
+    .catch((err: any) => { console.error("[services] query failed:", err); return null; }),
+  auth.elevate(categoriesV2.queryCategories)().find().catch(() => null),
+]);
+
+const serviceList: any[] = (servicesResult?.items ?? []).filter((s: any) => !s.hidden);
+const categories: any[] = catResult?.items ?? [];
+const showCategoryBar = categories.length > 1;
+
+const hrefWith = (patch: Record<string, string | null>): string => {
+  const p = new URLSearchParams();
+  if (selectedCategory) p.set("category", selectedCategory);
+  for (const [k, v] of Object.entries(patch)) {
+    if (v === null) p.delete(k);
+    else p.set(k, v);
+  }
+  const qs = p.toString();
+  return qs ? `/services?${qs}` : "/services";
+};
+
+const getSlug = (s: any): string => s.mainSlug?.name ?? s._id;
+const formatPrice = (s: any): string | undefined => {
+  const p = s.payment;
+  if (!p || p.rateType === "NO_FEE") return undefined;
+  if (p.rateType === "FIXED" && p.fixed?.price) {
+    const { value, currency } = p.fixed.price;
+    if (!value) return undefined;
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: currency ?? "USD" }).format(Number(value));
+  }
+  return undefined;
+};
+const getDuration = (s: any): number => s.schedule?.availabilityConstraints?.sessionDurations?.[0] ?? 60;
+---
+
+<Layout title="Book a Lesson">
+  <section class="services-page">
+    <header class="services-header">
+      <h1>Piano Lessons</h1>
+      <p>Choose the lesson type that works best for you</p>
+    </header>
+
+    {showCategoryBar && (
+      <nav class="booking-filter-bar" aria-label="Filter by category">
+        <a href={hrefWith({ category: null })} class={`booking-filter-chip${selectedCategory ? "" : " booking-filter-chip--active"}`}>All</a>
+        {categories.map((cat: any) => (
+          <a
+            href={hrefWith({ category: cat._id })}
+            class={`booking-filter-chip${selectedCategory === cat._id ? " booking-filter-chip--active" : ""}`}
+          >
+            {cat.name ?? "Category"}
+          </a>
+        ))}
+      </nav>
+    )}
+
+    {serviceList.length === 0 ? (
+      <p class="services-empty">Services coming soon — check back shortly.</p>
+    ) : (
+      <div class="service-grid">
+        {serviceList.map((s) => (
+          <ServiceCard
+            id={s._id}
+            slug={getSlug(s)}
+            name={s.name ?? "Untitled"}
+            tagLine={s.tagLine ?? s.description}
+            durationMinutes={getDuration(s)}
+            price={formatPrice(s)}
+            imageUrl={s.media?.mainMedia?.image?.url}
+            type={s.type ?? "APPOINTMENT"}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .services-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .services-header {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .services-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 0.75rem;
+    color: var(--text);
+  }
+
+  .services-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+
+  .services-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 3rem 0;
+  }
+
+  /* Override service-card placeholder colour to match site palette */
+  :global(.service-card-image--placeholder) {
+    background-color: #f0ede4 !important;
+  }
+</style>

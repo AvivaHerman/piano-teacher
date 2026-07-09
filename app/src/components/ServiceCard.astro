@@ -1,0 +1,40 @@
+---
+interface Props {
+  id: string;
+  slug: string;
+  name: string;
+  tagLine?: string;
+  durationMinutes: number;
+  price?: string;
+  imageUrl?: string;
+  type: "APPOINTMENT" | "CLASS";
+  locationId?: string;
+  locationType?: string;
+}
+
+const { slug, name, tagLine, durationMinutes, price, imageUrl, locationId, locationType } = Astro.props;
+
+const q = new URLSearchParams();
+if (locationId) q.set("locationId", locationId);
+if (locationType) q.set("locationType", locationType);
+const qs = q.toString();
+const href = qs ? `/services/${slug}?${qs}` : `/services/${slug}`;
+---
+
+<a href={href} class="service-card">
+  {imageUrl ? (
+    <div class="service-card-image">
+      <img src={imageUrl} alt={name} loading="lazy" />
+    </div>
+  ) : (
+    <div class="service-card-image service-card-image--placeholder" aria-hidden="true" />
+  )}
+  <div class="service-card-meta">
+    <h3 class="service-card-name">{name}</h3>
+    {tagLine && <p class="service-card-tagline">{tagLine}</p>}
+    <div class="service-card-price">
+      <span>{durationMinutes} min</span>
+      {price && <span>{price}</span>}
+    </div>
+  </div>
+</a>

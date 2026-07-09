@@ -1,0 +1,100 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const serviceName = Astro.url.searchParams.get("service") ?? "your lesson";
+const startDateParam = Astro.url.searchParams.get("startDate");
+const formattedDate = startDateParam
+  ? new Date(startDateParam).toLocaleString("en-US", {
+      weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
+    })
+  : null;
+---
+
+<Layout title="Booking Confirmed">
+  <section class="confirmation">
+    <div class="check-circle" aria-hidden="true">✓</div>
+    <h1>Thank you for booking!</h1>
+
+    {formattedDate ? (
+      <p>
+        Your <strong>{serviceName}</strong> is confirmed for <strong>{formattedDate}</strong>.
+        We've sent the details to your email.
+      </p>
+    ) : (
+      <p>
+        Your <strong>{serviceName}</strong> booking is confirmed. We've sent the details to your email.
+      </p>
+    )}
+
+    <div class="confirmation-actions">
+      <a href="/services" class="btn btn-primary">Browse more lessons</a>
+      <a href="/" class="btn-text">Return home</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .confirmation {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 6rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .check-circle {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ebony);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+  }
+
+  p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  p strong { color: var(--text); }
+
+  .confirmation-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 2rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--gold); color: var(--ebony); }
+  .btn-primary:hover { background: var(--gold-light); }
+
+  .btn-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: underline;
+  }
+  .btn-text:hover { color: var(--text); }
+</style>
