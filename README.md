@@ -32,6 +32,16 @@ Live site: **[my piano teacher](https://www.my-piano-teacher.com/)**
 - Scrolling note strip above the keyboard — highlights the current note as the song plays
 - Members can add custom songs (note sequence + BPM), persisted in `localStorage`
 
+### Practice Sheet (member-only)
+- Member-gated `/practice` page — redirects to login if not authenticated
+- Choose **skill level** (Beginner / Intermediate / Advanced) and content source (Curated / Generated)
+- **Curated melodies**: 2 hand-authored pieces per level (e.g. Morning Walk, Ode to Joy, Horizon Line)
+- **Generated melodies**: seeded PRNG (mulberry32) produces reproducible scales, arpeggios, or stepwise melodies within the level's note pool and rhythm rules
+- Custom **SVG staff renderer** — no external notation library; draws treble clef, 5-line staff, 4/4 time signature, note heads (filled quarter/eighth, hollow half/whole), stems, eighth-note flags (bezier), bar lines, ledger lines for middle C
+- Finger numbers (1–5) above each note for beginner/intermediate; note letter names below
+- **Playback**: Web Audio engine highlights each note in gold as it sounds; Play/Stop controls; timing driven by cascading `setTimeout` at the sheet's BPM
+- **New Sheet** button generates a fresh melody without a page reload
+
 ---
 
 ## Stack
@@ -66,7 +76,8 @@ piano-teacher/
     │   │   ├── logout.astro            # Clears session cookie
     │   │   ├── member/index.astro      # Member dashboard (bookings + profile)
     │   │   ├── api/members/search.ts   # Member search API (for co-participant picker)
-    │   │   └── play.astro              # Piano game page
+    │   │   ├── play.astro              # Piano game page
+    │   │   └── practice.astro          # Practice sheet page (member-gated)
     │   ├── components/
     │   │   ├── bookingDriver.ts        # Wix booking sequence (createBooking → cart → checkout)
     │   │   ├── AvailabilityCalendar.tsx # Week calendar, slot picker (APPOINTMENT + CLASS)
@@ -74,9 +85,14 @@ piano-teacher/
     │   │   ├── ServiceBookingFlow.tsx  # Step coordinator (calendar → form)
     │   │   ├── CoParticipantSelector.tsx # Member search + picker for couples/group lessons
     │   │   ├── ServiceCard.astro       # Service listing card
-    │   │   └── PianoGame.tsx           # Interactive piano keyboard + songs
+    │   │   ├── PianoGame.tsx           # Interactive piano keyboard + songs
+    │   │   ├── PracticeSheet.tsx       # Practice sheet UI (level/type controls, playback)
+    │   │   └── StaffSheet.tsx          # Pure SVG staff notation renderer
     │   ├── lib/
-    │   │   └── memberAuth.ts           # Session cookie parsing utilities
+    │   │   ├── memberAuth.ts           # Session cookie parsing utilities
+    │   │   ├── music.ts                # Shared pitch model (FREQ, note types, DIATONIC_STEPS)
+    │   │   ├── audio.ts                # Shared Web Audio engine (playNote)
+    │   │   └── practiceMelodies.ts     # Melody generator, curated melodies, fingering logic
     │   └── styles/
     │       └── components-bookings.css # Booking component styles (design-token CSS)
     ├── wix.config.json                 # Wix app + site IDs
@@ -99,6 +115,7 @@ The dev server proxies Wix SDK calls through your linked site. Requires a Wix ac
 
 ```bash
 cd app
+npm run build   # always build first — wix release deploys dist/ as-is
 wix release
 ```
 

@@ -35,6 +35,7 @@ const loggedIn = isMember(session);
         {loggedIn ? (
           <>
             <a href="/member" class:list={[{ active: currentPath.startsWith('/member') }]}>My Area</a>
+            <a href="/practice" class:list={[{ active: currentPath === '/practice' }]}>Practice</a>
             <a href="/logout" class="nav-logout">Sign out</a>
           </>
         ) : (

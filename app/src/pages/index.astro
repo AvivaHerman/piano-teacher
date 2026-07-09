@@ -20,9 +20,81 @@ import Layout from '../layouts/Layout.astro';
         class="hero-piano-photo"
       />
     </div>
+
+    <!-- ── Hand-drawn note decorations ── -->
+    <div class="music-bg" aria-hidden="true">
+
+      <!-- Treble clef — top-left, large, very faint -->
+      <svg class="mn" style="top:-3%;left:0%;width:100px;" viewBox="0 0 44 120">
+        <text x="0" y="115" font-family="Georgia,serif" font-size="112" fill="currentColor">𝄞</text>
+      </svg>
+
+      <!-- Beamed pair — top-right -->
+      <svg class="mn" style="top:5%;right:1%;width:130px;transform:rotate(9deg);" viewBox="0 0 85 70">
+        <ellipse cx="14" cy="60" rx="14" ry="9" transform="rotate(-18 14 60)" fill="currentColor"/>
+        <ellipse cx="58" cy="52" rx="14" ry="9" transform="rotate(-18 58 52)" fill="currentColor"/>
+        <line x1="26" y1="55" x2="26" y2="10" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="70" y1="47" x2="70" y2="2"  stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="26" y1="10" x2="70" y2="2"  stroke="currentColor" stroke-width="8"   stroke-linecap="round"/>
+      </svg>
+
+      <!-- Eighth note — left side, mid -->
+      <svg class="mn" style="top:44%;left:0%;width:68px;transform:rotate(-13deg);" viewBox="0 0 44 66">
+        <ellipse cx="14" cy="57" rx="13" ry="9" transform="rotate(-18 14 57)" fill="currentColor"/>
+        <line x1="25" y1="52" x2="25" y2="7" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M25 7 C40 13 44 27 33 41" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Quarter note — bottom-left -->
+      <svg class="mn" style="bottom:7%;left:7%;width:58px;transform:rotate(-7deg);" viewBox="0 0 36 70">
+        <ellipse cx="12" cy="60" rx="13" ry="9" transform="rotate(-18 12 60)" fill="currentColor"/>
+        <line x1="24" y1="55" x2="24" y2="4" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Beamed triple (sixteenths) — bottom-centre -->
+      <svg class="mn" style="bottom:4%;left:34%;width:150px;transform:rotate(-4deg);" viewBox="0 0 115 72">
+        <ellipse cx="12"  cy="62" rx="12" ry="8" transform="rotate(-18 12  62)" fill="currentColor"/>
+        <ellipse cx="52"  cy="56" rx="12" ry="8" transform="rotate(-18 52  56)" fill="currentColor"/>
+        <ellipse cx="92"  cy="50" rx="12" ry="8" transform="rotate(-18 92  50)" fill="currentColor"/>
+        <line x1="23" y1="57" x2="23" y2="10" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="63" y1="51" x2="63" y2="4"  stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="103" y1="45" x2="103" y2="-2" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="23" y1="10" x2="103" y2="-2" stroke="currentColor" stroke-width="6.5" stroke-linecap="round"/>
+        <line x1="23" y1="20" x2="103" y2="8"  stroke="currentColor" stroke-width="6.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Single eighth note — right, lower-mid -->
+      <svg class="mn" style="bottom:18%;right:1%;width:60px;transform:rotate(7deg);" viewBox="0 0 44 66">
+        <ellipse cx="14" cy="57" rx="13" ry="9" transform="rotate(-18 14 57)" fill="currentColor"/>
+        <line x1="25" y1="52" x2="25" y2="7" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M25 7 C40 13 44 27 33 41" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Small quarter note — top centre, just above hero content -->
+      <svg class="mn" style="top:3%;left:46%;width:44px;transform:rotate(4deg);opacity:0.05;" viewBox="0 0 36 70">
+        <ellipse cx="12" cy="60" rx="13" ry="9" transform="rotate(-18 12 60)" fill="currentColor"/>
+        <line x1="24" y1="55" x2="24" y2="4" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+
+    </div>
   </section>
 
   <section class="lessons">
+    <div class="section-notes" aria-hidden="true">
+      <!-- Quarter note — top-left corner of lessons -->
+      <svg class="mn" style="top:5%;left:0%;width:52px;transform:rotate(-9deg);" viewBox="0 0 36 70">
+        <ellipse cx="12" cy="60" rx="13" ry="9" transform="rotate(-18 12 60)" fill="currentColor"/>
+        <line x1="24" y1="55" x2="24" y2="4" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <!-- Beamed pair — bottom-right -->
+      <svg class="mn" style="bottom:3%;right:1%;width:110px;transform:rotate(11deg);" viewBox="0 0 85 70">
+        <ellipse cx="14" cy="60" rx="14" ry="9" transform="rotate(-18 14 60)" fill="currentColor"/>
+        <ellipse cx="58" cy="52" rx="14" ry="9" transform="rotate(-18 58 52)" fill="currentColor"/>
+        <line x1="26" y1="55" x2="26" y2="10" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="70" y1="47" x2="70" y2="2"  stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="26" y1="10" x2="70" y2="2"  stroke="currentColor" stroke-width="8"   stroke-linecap="round"/>
+      </svg>
+    </div>
     <div class="container">
       <h2>Lesson Types</h2>
       <p class="section-subtitle">Choose the format that works best for you</p>
@@ -66,6 +138,18 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <section class="game-promo">
+    <div class="section-notes" aria-hidden="true">
+      <!-- Treble clef — right edge, faint -->
+      <svg class="mn" style="top:-5%;right:-1%;width:88px;opacity:0.05;" viewBox="0 0 44 120">
+        <text x="0" y="115" font-family="Georgia,serif" font-size="112" fill="currentColor">𝄞</text>
+      </svg>
+      <!-- Eighth note — lower-left -->
+      <svg class="mn" style="bottom:5%;left:1%;width:62px;transform:rotate(-11deg);" viewBox="0 0 44 66">
+        <ellipse cx="14" cy="57" rx="13" ry="9" transform="rotate(-18 14 57)" fill="currentColor"/>
+        <line x1="25" y1="52" x2="25" y2="7" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M25 7 C40 13 44 27 33 41" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div class="container">
       <div class="promo-content">
         <div class="promo-text">
@@ -250,6 +334,15 @@ import Layout from '../layouts/Layout.astro';
   .promo-text p { color: var(--pencil-mid); font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.75rem; }
 
   .promo-keys { font-size: 8rem; opacity: 0.12; flex-shrink: 0; }
+
+  /* ── Musical note decorations ─────────────────────────────────────────── */
+  .music-bg, .section-notes {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  }
+  .mn { position: absolute; color: var(--pencil); opacity: 0.07; }
+  .hero-content, .hero-visual { position: relative; z-index: 1; }
+  .lessons { position: relative; overflow: hidden; }
+  .game-promo { position: relative; overflow: hidden; }
 
   @media (max-width: 768px) {
     .hero { flex-direction: column; text-align: center; justify-content: center; padding: 3rem 1.5rem; }

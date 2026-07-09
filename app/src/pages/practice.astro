@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PracticeSheet from '../components/PracticeSheet';
+import { parseSession, isMember } from '../lib/memberAuth';
+
+const session = parseSession(Astro.cookies.get("wixSession"));
+if (!isMember(session)) return Astro.redirect("/login?redirect=/practice");
+---
+
+<Layout title="Practice">
+  <div class="page-header">
+    <div class="container">
+      <h1>Practice Sheet</h1>
+      <p>Choose a skill level and get a reading exercise — then play along to hear it.</p>
+    </div>
+  </div>
+  <div class="practice-container">
+    <PracticeSheet client:load />
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    background: var(--paper-dark);
+    border-bottom: 1.5px solid rgba(197,212,232,0.85);
+    padding: 3.5rem 6vw 3rem;
+  }
+  .page-header h1 { color: var(--pencil); font-size: 2.6rem; margin-bottom: 0.5rem; }
+  .page-header p  { color: var(--pencil-mid); font-size: 1.05rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+  .practice-container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 6vw 5rem; }
+
+  @media (max-width: 640px) {
+    .page-header      { padding: 2rem 1.5rem; }
+    .practice-container { padding: 1.5rem 1rem 3rem; }
+  }
+</style>

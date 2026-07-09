@@ -1,33 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-
-// ── note frequencies (two octaves: C4–B5) ──────────────────────────────────
-const FREQ: Record<string, number> = {
-  C4: 261.63, 'C#4': 277.18, D4: 293.66, 'D#4': 311.13,
-  E4: 329.63, F4: 349.23, 'F#4': 369.99, G4: 392.00,
-  'G#4': 415.30, A4: 440.00, 'A#4': 466.16, B4: 493.88,
-  C5: 523.25, 'C#5': 554.37, D5: 587.33, 'D#5': 622.25,
-  E5: 659.25, F5: 698.46, 'F#5': 739.99, G5: 783.99,
-  'G#5': 830.61, A5: 880.00, 'A#5': 932.33, B5: 987.77,
-};
-
-// White keys in order across two octaves
-const WHITE_KEYS = ['C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5'];
-// Black keys: index within white-key positions (gaps are null)
-const BLACK_KEYS: (string | null)[] = [
-  'C#4','D#4',null,'F#4','G#4','A#4',null,
-  'C#5','D#5',null,'F#5','G#5','A#5',null,
-];
-
-// ── built-in songs ──────────────────────────────────────────────────────────
-type SongNote = { note: string; beats: number };
-
-interface Song {
-  id: string;
-  title: string;
-  bpm: number;
-  notes: SongNote[];
-  builtin?: boolean;
-}
+import { FREQ, WHITE_KEYS, BLACK_KEYS, type SongNote, type Song } from '../lib/music';
+import { playNote } from '../lib/audio';
 
 const BUILTIN_SONGS: Song[] = [
   {
@@ -67,39 +40,6 @@ const BUILTIN_SONGS: Song[] = [
     ],
   },
 ];
-
-// ── audio ───────────────────────────────────────────────────────────────────
-let audioCtx: AudioContext | null = null;
-function getCtx(): AudioContext {
-  if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-  return audioCtx;
-}
-
-function playNote(note: string, durationSec = 1.2) {
-  const freq = FREQ[note];
-  if (!freq) return;
-  const ctx = getCtx();
-  if (ctx.state === 'suspended') ctx.resume();
-
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  const now = ctx.currentTime;
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(freq, now);
-
-  // Piano-like ADSR
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.7, now + 0.008);
-  gain.gain.exponentialRampToValueAtTime(0.25, now + 0.12);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + durationSec);
-
-  osc.start(now);
-  osc.stop(now + durationSec + 0.05);
-}
 
 // ── keyboard mapping (z–m for white keys) ──────────────────────────────────
 const KEY_MAP: Record<string, string> = {
