@@ -1,76 +1,83 @@
-# Project Retrospective — Piano Teacher Headless Site
+# Project Retro — Piano Teacher Site
 
-**Date:** 2026-07-09  
-**Scope:** Pricing Plans feature + login fix + UI tweaks
+## What Went Well
 
----
+**Paper/pencil theme landed great**
+Pure CSS — lined paper background with `repeating-linear-gradient`, red margin line, Caveat + Patrick Hand fonts. No extra images, no dependencies. Feels handwritten without sacrificing readability.
 
-## What went well
+**Hero photo fade effect**
+CSS `mask-image` with two intersecting linear gradients (horizontal × vertical) gives a clean edge-dissolve into the paper background. Took one iteration to get the composition right but the technique is solid.
 
-### Wix SDK + Astro integration is solid
-The `@wix/astro` adapter handled SSR, cookie-based sessions, and the elevated API calls cleanly. Once the right pattern was found (`auth.elevate(fn)(args)`), server-side Wix API calls were reliable and predictable.
+**OAuth PKCE auth flow**
+Login → Wix-hosted OAuth → callback → `wixSession` cookie works end-to-end. Member detection via `refreshToken.role === "member"` is simple and reliable. The guarded `/member` route pattern is reusable.
 
-### Pricing Plans end-to-end in one session
-Installed the app, created 3 plans via REST, built the `/plans` listing page, the `/api/plans/checkout` endpoint, and wired up the member dashboard — all in a single pass. The build stayed green throughout.
+**Bookings integration**
+`bookingDriver.ts` encapsulates the full booking sequence (createBooking → createCart → calculateCart → redirect/placeOrder) cleanly. The module is framework-agnostic and well-documented.
 
-### Redirect session pattern was reusable
-The `redirects.createRedirectSession` pattern from bookings (`ecomCheckout`) transferred cleanly to `paidPlansCheckout`. One pattern, two features.
-
-### `auth.elevate()` worked consistently
-Using `auth.elevate()` from `@wix/essentials` for admin-level queries (plans, bookings) avoided member-context permission errors without needing a separate API key.
+**`@wix/astro` ambient auth pattern**
+No manual `createClient` / token management needed anywhere except the login flow itself. SDK calls in Astro frontmatter and React components just work.
 
 ---
 
-## What didn't go well
+## What Didn't Go Well
 
-### Wix Plans V3 API required too much trial and error
-Multiple round-trips to fix:
-- Body must be wrapped in `plan: {}` (not obvious from the error)
-- Sub-entities (`perks`, `pricingVariants`) each need explicit GUIDs
-- `status: 'ACTIVE'` is required even though it should default
-- `pricingVariants[0].id must not be empty` was a separate error from `perks[n].id`
+**Stale dist/ caused missing Sign In button on deploy**
+`wix release` was run at 14:05, then `Layout.astro` was edited at 14:38 with the auth-conditional nav. The compiled chunk in `dist/` was stale. Live site silently served the old nav. Cost ~30 min to diagnose by comparing file timestamps.
 
-Each of these was a separate 400 with a different message. Better upfront schema validation in the SDK would have caught all of these at once.
+**Pricing Plans app not installed on the Wix site**
+Hit `APP_NOT_INSTALLED` when trying to query plans via the API. The Pricing Plans feature has to be explicitly enabled from the Wix dashboard (Business Apps → Pricing Plans) before any API calls or redirects work. Discovered late, after researching the checkout flow.
 
-### The login page was broken before we started
-`login.astro` was using `OAuthStrategy({ clientId })` directly — a bare client-side instance with no server credentials. When `getAuthUrl()` internally calls `redirects.createRedirectSession`, it had nothing to authenticate with.
+**npm network error**
+`npm install @wix/pricing-plans` failed with a proxy/network error in the dev environment. Had to leave the pricing feature half-built.
 
-The `@wix/astro` integration already injects `/api/auth/login` and `/api/auth/callback` using `getContextualAuth()`, and none of that was being used. The fix was 7 lines, but the bug had been live since the auth feature was originally built.
+**Hero photo took two tries**
+First photo was a flat top-down overhead shot — wrong aesthetic entirely. User's reference images showed low-angle, shallow DOF, keys fading into bright light. Lesson: confirm composition before uploading; "piano keyboard photo" is underspecified.
 
-### `logout.astro` has the same problem and wasn't fixed
-`logout.astro` also instantiates `OAuthStrategy` directly. It happens to work because the failure path is silently swallowed — the cookie gets deleted regardless. But it means Wix-side session revocation silently fails every time. It's the same root cause, not fixed yet.
-
-### `login/callback.astro` is now dead code
-The old callback lived at `/login/callback`, but the built-in route is at `/api/auth/callback`. After the login fix, the custom callback is never reached. It still references the old `wixOAuthData` cookie name (the built-in uses `oAuthState`). Dead and confusing.
-
-### Image sizing required two iterations
-The first pass set a fixed `560px` width on the piano photo — wrong starting point, should have used `flex: 1` + `width: 100%` from the beginning to let it scale with the layout.
+**Unsplash short IDs 404'd**
+Short photo IDs from Unsplash search results (`jFc549i-jpw`) didn't resolve on the CDN. Needed to visit each photo's own page to get the full URL. Pexels worked first try.
 
 ---
 
-## What can be better
+## What Can Be Better
 
-### Use `@wix/astro` built-in auth everywhere
-The pattern: custom pages at `/login` and `/logout` that delegate to `/api/auth/login` and `/api/auth/logout` (built-in). No custom OAuth logic in page files. `/login` already follows this now — `/logout` should too.
+**Pricing plans are still incomplete**
+The entire feature (page + subscribe redirect + nav link) is blocked on:
+1. Installing Pricing Plans from Wix dashboard
+2. Creating plans there (name, price, billing cycle, perks)
+3. Running `npm install @wix/pricing-plans` (once network is available)
+4. Building `pricing.astro` + `subscribe/[planId].astro`
 
-### Validate SDK patterns against the integration's own source first
-Before writing custom OAuth or redirect logic, check `node_modules/@wix/astro/build/dependencies/astro-auth/` — the correct implementation is usually already there.
+The checkout redirect is simple — `createRedirectSession({ paidPlansCheckout: { planId } })` — Wix handles login + payment in one flow.
 
-### Wix REST API calls should go through the SDK types, not raw fetch
-Plan creation used raw `fetch` because the SDK didn't expose a `createPlan` method with a clean interface. If the SDK type definitions had been checked first (`@wix/pricing-plans` exports), the body shape would have been clear upfront.
+**Mobile nav needs a hamburger menu**
+On small screens the nav links wrap awkwardly. Hero visual already hides on mobile. A hamburger/drawer would clean up the small-screen experience.
 
-### Error messages should be more specific
-The login error shown to users was "Login failed: System error occurred: {}" — the raw Wix API error serialized to an empty object. User-facing errors should map SDK errors to readable messages, not expose internal JSON.
+**No 404 page**
+Custom 404 would keep the paper/pencil theme consistent on bad URLs.
+
+**Member area is minimal**
+The `/member` dashboard is a placeholder. Could show upcoming bookings, active subscription plan, song playlist — the data is all available via the Wix SDK.
+
+**No loading/error states in booking flow**
+BookingServices component doesn't surface API errors gracefully. A failed `createBooking` call currently leaves the user with no feedback.
 
 ---
 
-## What needs to be fixed
+## Needs to Fix Before Next Release
 
-| Issue | Priority | File |
-|---|---|---|
-| `logout.astro` uses bare `OAuthStrategy` — Wix-side session revocation silently fails | Medium | `src/pages/logout.astro` |
-| `login/callback.astro` is dead code — confusing and references wrong cookie name | Low | `src/pages/login/callback.astro` |
-| Payment provider not connected — pricing plans checkout will fail for real users | High | Wix Dashboard → Pricing Plans → Payments |
-| `orders.memberListOrders()` field names unverified — `order.planName`, `order.endDate` may be wrong | Medium | `src/pages/member/index.astro` |
-| Plans page visibility filter uses `p.visibility === "PUBLIC" \|\| p.visibility === 1` — the number fallback is a guess | Low | `src/pages/plans/index.astro` |
-| No mobile layout for hero with piano image — `hero-visual` hidden on mobile but transition could be smoother | Low | `src/pages/index.astro` |
+| # | Item | Effort |
+|---|------|--------|
+| 1 | Install Pricing Plans app from Wix dashboard → create plans | 15 min (manual) |
+| 2 | `npm install @wix/pricing-plans` | 1 min (once network works) |
+| 3 | Build `/pricing` page + `/subscribe/[planId]` redirect | ~2 h |
+| 4 | Add "Plans" link to nav | 5 min |
+| 5 | Confirm `wix release` is always run after any Layout/nav change | process |
+
+---
+
+## Key Lessons
+
+- Always `wix release` after any Layout change — the compiled chunks don't rebuild incrementally.
+- For photo references, ask for composition details up front (angle, depth of field, light direction).
+- The Pricing Plans app must be dashboard-installed before any API or redirect call touches it — check app status early.
+- `paidPlansCheckout: { planId }` in `createRedirectSession` is the entire subscribe checkout flow. No cart, no order creation needed.
