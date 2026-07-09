@@ -276,7 +276,28 @@ export default function PianoGame() {
   }
 
   const whiteKeyWidth = 54;
-  const totalWidth = WHITE_KEYS.length * whiteKeyWidth + (WHITE_KEYS.length - 1) * 3;
+  const keyGap = 3;
+  const totalWidth = WHITE_KEYS.length * whiteKeyWidth + (WHITE_KEYS.length - 1) * keyGap;
+
+  // Compute horizontal center (px) for any note relative to the keyboard left edge
+  function getNoteCenter(note: string): number {
+    const wi = WHITE_KEYS.indexOf(note);
+    if (wi !== -1) return wi * (whiteKeyWidth + keyGap) + whiteKeyWidth / 2;
+    const bi = BLACK_KEYS.indexOf(note);
+    if (bi !== -1) return bi * (whiteKeyWidth + keyGap) + whiteKeyWidth * 0.62 + 17;
+    return -1;
+  }
+
+  // Current + next 6 notes to show above the keyboard
+  const guideNotes = (() => {
+    if (!selectedSong) return [];
+    const start = playing ? Math.max(0, playIndex) : 0;
+    const out: { note: string; step: number }[] = [];
+    for (let i = start; i < selectedSong.notes.length && out.length < 7; i++) {
+      out.push({ note: selectedSong.notes[i].note, step: i - start });
+    }
+    return out;
+  })();
 
   return (
     <div className="game-root">
@@ -314,38 +335,62 @@ export default function PianoGame() {
         </div>
       )}
 
-      {/* Piano keyboard */}
+      {/* Piano keyboard + note guide */}
       <div className="keyboard-wrapper">
-        <div className="keyboard" style={{ width: totalWidth, position: 'relative', height: 180 }}>
-          {/* White keys */}
-          {WHITE_KEYS.map((note, i) => (
-            <button
-              key={note}
-              className={`key-white ${activeKeys.has(note) ? 'pressed' : ''}`}
-              style={{ left: i * (whiteKeyWidth + 3) }}
-              onMouseDown={() => handleKeyPress(note)}
-              onTouchStart={e => { e.preventDefault(); handleKeyPress(note); }}
-              aria-label={note}
-            >
-              <span className="key-label">{note}</span>
-            </button>
-          ))}
-          {/* Black keys */}
-          {BLACK_KEYS.map((note, i) => {
-            if (!note) return null;
-            // Position: between white keys i and i+1
-            const leftEdge = i * (whiteKeyWidth + 3) + whiteKeyWidth * 0.62;
-            return (
+        <div style={{ width: totalWidth }}>
+          {/* Note guide — positioned bubbles above keys */}
+          <div className="note-guide" style={{ width: totalWidth }}>
+            {guideNotes.map(({ note, step }) => {
+              const cx = getNoteCenter(note);
+              if (cx < 0) return null;
+              return (
+                <div
+                  key={`${note}-${step}`}
+                  className={`ng-bubble ${step === 0 ? 'ng-bubble--current' : ''}`}
+                  style={{
+                    left: cx,
+                    opacity: Math.max(0.18, 1 - step * 0.16),
+                    zIndex: 10 - step,
+                  }}
+                >
+                  {note}
+                  {step === 0 && <div className="ng-arrow" />}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Keyboard */}
+          <div className="keyboard" style={{ width: totalWidth, position: 'relative', height: 180 }}>
+            {/* White keys */}
+            {WHITE_KEYS.map((note, i) => (
               <button
                 key={note}
-                className={`key-black ${activeKeys.has(note) ? 'pressed' : ''}`}
-                style={{ left: leftEdge }}
+                className={`key-white ${activeKeys.has(note) ? 'pressed' : ''}`}
+                style={{ left: i * (whiteKeyWidth + keyGap) }}
                 onMouseDown={() => handleKeyPress(note)}
                 onTouchStart={e => { e.preventDefault(); handleKeyPress(note); }}
                 aria-label={note}
-              />
-            );
-          })}
+              >
+                <span className="key-label">{note}</span>
+              </button>
+            ))}
+            {/* Black keys */}
+            {BLACK_KEYS.map((note, i) => {
+              if (!note) return null;
+              const leftEdge = i * (whiteKeyWidth + keyGap) + whiteKeyWidth * 0.62;
+              return (
+                <button
+                  key={note}
+                  className={`key-black ${activeKeys.has(note) ? 'pressed' : ''}`}
+                  style={{ left: leftEdge }}
+                  onMouseDown={() => handleKeyPress(note)}
+                  onTouchStart={e => { e.preventDefault(); handleKeyPress(note); }}
+                  aria-label={note}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -428,9 +473,53 @@ export default function PianoGame() {
           padding: 0.2rem 0.6rem; border-radius: 99px;
         }
 
-        /* keyboard */
+        /* keyboard + note guide */
         .keyboard-wrapper { overflow-x: auto; padding-bottom: 0.5rem; }
         .keyboard { height: 180px; }
+
+        .note-guide {
+          position: relative;
+          height: 52px;
+          margin-bottom: 6px;
+        }
+
+        .ng-bubble {
+          position: absolute;
+          transform: translateX(-50%);
+          bottom: 10px;
+          background: var(--card-bg);
+          border: 1.5px solid var(--border);
+          border-radius: 6px;
+          padding: 2px 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          font-family: monospace;
+          color: var(--text-muted);
+          white-space: nowrap;
+          pointer-events: none;
+          transition: opacity 0.15s;
+        }
+
+        .ng-bubble--current {
+          background: var(--gold);
+          border-color: var(--gold);
+          color: var(--ebony);
+          font-size: 0.78rem;
+          bottom: 12px;
+          box-shadow: 0 2px 8px rgba(201,168,76,0.4);
+        }
+
+        .ng-arrow {
+          position: absolute;
+          bottom: -7px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 7px solid var(--gold);
+        }
 
         .key-white {
           position: absolute; bottom: 0;

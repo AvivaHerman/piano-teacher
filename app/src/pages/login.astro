@@ -1,54 +1,9 @@
 ---
-import { OAuthStrategy } from "@wix/sdk";
 import { parseSession, isMember } from "../lib/memberAuth";
 
-// Redirect already-logged-in members
 const session = parseSession(Astro.cookies.get("wixSession"));
 if (isMember(session)) return Astro.redirect("/member");
 
-const CLIENT_ID = import.meta.env.WIX_CLIENT_ID as string;
-const origin = Astro.url.origin;
-const callbackUrl = `${origin}/login/callback`;
-
-let authUrl = "";
-let initError = "";
-
-try {
-  const auth = OAuthStrategy({ clientId: CLIENT_ID });
-  const oauthData = auth.generateOAuthData(callbackUrl);
-  const result = await auth.getAuthUrl(oauthData);
-  authUrl = result.authUrl;
-
-  Astro.cookies.set("wixOAuthData", oauthData as any, {
-    httpOnly: true,
-    path: "/",
-    maxAge: 300,
-    sameSite: "lax",
-    secure: true,
-  });
-} catch (err: any) {
-  initError = err?.message ?? "Failed to start login";
-}
-
-if (authUrl) return Astro.redirect(authUrl);
+const returnTo = Astro.url.searchParams.get("redirect") ?? Astro.url.searchParams.get("returnTo") ?? "/member";
+return Astro.redirect(`/api/auth/login?returnTo=${encodeURIComponent(returnTo)}`);
 ---
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Login | Piano Teacher</title>
-    <style>
-      body { font-family: 'Patrick Hand', cursive; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f7f3e8; color: #1a150e; margin: 0; }
-      .box { text-align: center; }
-      p { color: #c43030; }
-      a { color: #c49238; }
-    </style>
-  </head>
-  <body>
-    <div class="box">
-      <p>Login failed: {initError}</p>
-      <a href="/">Return home</a>
-    </div>
-  </body>
-</html>

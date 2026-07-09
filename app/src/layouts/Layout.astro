@@ -30,6 +30,7 @@ const loggedIn = isMember(session);
       <div class="nav-links">
         <a href="/" class:list={[{ active: currentPath === '/' }]}>Home</a>
         <a href="/services" class:list={[{ active: currentPath.startsWith('/services') }]}>Book a Lesson</a>
+        <a href="/plans" class:list={[{ active: currentPath.startsWith('/plans') }]}>Plans</a>
         <a href="/play" class:list={[{ active: currentPath === '/play' }]}>Play Piano</a>
         {loggedIn ? (
           <>

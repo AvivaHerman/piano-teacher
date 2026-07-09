@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { members } from "@wix/members";
 import { extendedBookings } from "@wix/bookings";
+import { orders } from "@wix/pricing-plans";
 import { auth } from "@wix/essentials";
 import { parseSession, isMember } from "../../lib/memberAuth";
 
@@ -55,6 +56,19 @@ try {
   console.error("[member] queryExtendedBookings failed:", err);
 }
 
+// Fetch member's active pricing plan orders
+let activePlans: any[] = [];
+try {
+  const planOrdersResult: any = await orders.memberListOrders();
+  activePlans = (planOrdersResult?.orders ?? []).filter(
+    (o: any) => o.status === "ACTIVE" || o.status === "PENDING"
+  );
+} catch (err) {
+  console.error("[member] memberListOrders failed:", err);
+}
+
+const planPurchased = Astro.url.searchParams.get("plan") === "purchased";
+
 function formatSlotDate(startDate: string | undefined): string {
   if (!startDate) return "TBD";
   return new Date(startDate).toLocaleString("en-US", {
@@ -74,10 +88,49 @@ function formatSlotDate(startDate: string | undefined): string {
       </div>
     </header>
 
+    {planPurchased && (
+      <div class="plan-success">
+        🎉 Your plan is now active! Enjoy your lessons.
+      </div>
+    )}
+
     <div class="member-actions">
       <a href="/services" class="btn btn-primary">Book a Lesson</a>
+      <a href="/plans" class="btn btn-outline-dark">View Plans</a>
       <a href="/logout" class="btn btn-outline-dark">Sign out</a>
     </div>
+
+    <section class="member-section">
+      <h2>My Plans</h2>
+      {activePlans.length === 0 ? (
+        <p class="empty-state">
+          No active plans. <a href="/plans">Browse plans →</a>
+        </p>
+      ) : (
+        <ul class="booking-list">
+          {activePlans.map((order: any) => {
+            const planName = order.planName ?? "Piano Plan";
+            const status = order.status ?? "";
+            const endDate = order.endDate;
+            return (
+              <li class="booking-card">
+                <div class="booking-card-left">
+                  <div class="booking-service">{planName}</div>
+                  {endDate && (
+                    <div class="booking-date">
+                      Valid until {new Date(endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </div>
+                  )}
+                </div>
+                <div class={`booking-status booking-status--${status.toLowerCase()}`}>
+                  {status === "ACTIVE" ? "Active" : status === "PENDING" ? "Pending" : status}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
 
     <section class="member-section">
       <h2>Upcoming Lessons</h2>
@@ -123,6 +176,15 @@ function formatSlotDate(startDate: string | undefined): string {
     max-width: 760px;
     margin: 0 auto;
     padding: 4rem 2rem 6rem;
+  }
+
+  .plan-success {
+    background: #d4f0dc;
+    color: #276749;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
   }
 
   .member-header {
