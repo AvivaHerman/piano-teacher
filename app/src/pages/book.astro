@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BookingServices from '../components/BookingServices';
+
+// Pre-select tab from query param
+const type = Astro.url.searchParams.get('type') ?? 'private';
+---
+
+<Layout title="Book a Lesson">
+  <div class="page-header">
+    <div class="container">
+      <h1>Book a Lesson</h1>
+      <p>Choose a lesson type and pick a time that works for you.</p>
+    </div>
+  </div>
+
+  <div class="container booking-layout">
+    <BookingServices client:load initialType={type} />
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    background: linear-gradient(135deg, var(--ebony) 0%, #1a2744 100%);
+    padding: 3.5rem 6vw 3rem;
+  }
+  .page-header h1 { color: #fff; font-size: 2.4rem; margin-bottom: 0.5rem; }
+  .page-header p { color: #a0aec0; font-size: 1.05rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+  .booking-layout { padding: 3rem 6vw; }
+
+  @media (max-width: 640px) {
+    .page-header { padding: 2rem 1.5rem; }
+    .booking-layout { padding: 2rem 1.5rem; }
+  }
+</style>

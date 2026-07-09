@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PianoGame from '../components/PianoGame';
+---
+
+<Layout title="Play Piano">
+  <div class="page-header">
+    <div class="container">
+      <h1>Piano Keyboard Game</h1>
+      <p>Play along with children's songs — click keys or use your keyboard. Members can add their own songs!</p>
+    </div>
+  </div>
+  <div class="game-container">
+    <PianoGame client:load />
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    background: linear-gradient(135deg, var(--ebony) 0%, #1a2744 100%);
+    padding: 3.5rem 6vw 3rem;
+  }
+  .page-header h1 { color: #fff; font-size: 2.4rem; margin-bottom: 0.5rem; }
+  .page-header p { color: #a0aec0; font-size: 1.05rem; }
+
+  .game-container { padding: 2rem 6vw 4rem; max-width: 1000px; margin: 0 auto; }
+
+  @media (max-width: 640px) {
+    .page-header { padding: 2rem 1.5rem; }
+    .game-container { padding: 1.5rem 1rem 3rem; }
+  }
+</style>

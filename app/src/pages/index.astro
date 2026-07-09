@@ -1,0 +1,249 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Home">
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">Professional Piano Instruction</div>
+      <h1>Learn Piano<br />at Any Level</h1>
+      <p>Private, couples, and group lessons tailored to you — from beginner to advanced. Plus a fun interactive piano game for kids!</p>
+      <div class="hero-actions">
+        <a href="/book" class="btn btn-primary">Book a Lesson</a>
+        <a href="/play" class="btn btn-outline">Try the Piano Game</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="piano-keys">
+        {Array.from({length: 7}, (_, i) => <div class="key white" />)}
+        <div class="blacks">
+          <div class="key black" />
+          <div class="key black" />
+          <div class="gap" />
+          <div class="key black" />
+          <div class="key black" />
+          <div class="key black" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="lessons">
+    <div class="container">
+      <h2>Lesson Types</h2>
+      <p class="section-subtitle">Choose the format that works best for you</p>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🎹</div>
+          <h3>Private Lessons</h3>
+          <p>One-on-one sessions fully tailored to your pace and goals. The fastest way to progress.</p>
+          <ul>
+            <li>Personalised curriculum</li>
+            <li>Flexible scheduling</li>
+            <li>30 or 60 minute sessions</li>
+          </ul>
+          <a href="/book?type=private" class="btn btn-secondary">Book Private</a>
+        </div>
+        <div class="card featured">
+          <div class="badge-popular">Most Popular</div>
+          <div class="card-icon">👫</div>
+          <h3>Couples Lessons</h3>
+          <p>Perfect for friends, siblings, or partners who want to learn together and share the joy of music.</p>
+          <ul>
+            <li>Duet repertoire</li>
+            <li>Collaborative learning</li>
+            <li>More affordable per person</li>
+          </ul>
+          <a href="/book?type=couples" class="btn btn-primary">Book Couples</a>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎵</div>
+          <h3>Group Lessons</h3>
+          <p>Fun, social sessions for 3–6 students. Great for children and beginner adults.</p>
+          <ul>
+            <li>Group of 3–6 students</li>
+            <li>Games and ensemble play</li>
+            <li>Most budget-friendly</li>
+          </ul>
+          <a href="/book?type=group" class="btn btn-secondary">Book Group</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="game-promo">
+    <div class="container">
+      <div class="promo-content">
+        <div class="promo-text">
+          <h2>Practice Makes Perfect</h2>
+          <p>Our interactive piano game lets students practise favourite children's songs right in the browser — no instrument needed. Members can add their own songs to their personal playlist.</p>
+          <a href="/play" class="btn btn-primary">Open the Piano Game</a>
+        </div>
+        <div class="promo-keys" aria-hidden="true">🎹</div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--ebony) 0%, #16213e 60%, #0f3460 100%);
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 6vw;
+    gap: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-content { max-width: 560px; z-index: 1; }
+
+  .badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: #a0aec0;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-block;
+    padding: 0.8rem 1.75rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary { background: var(--gold); color: var(--ebony); }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.3); }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.06); }
+
+  .btn-secondary { background: var(--ebony); color: #fff; }
+  .btn-secondary:hover { background: #2a2a4a; transform: translateY(-1px); }
+
+  /* decorative piano keys in hero */
+  .hero-visual { flex-shrink: 0; }
+  .piano-keys {
+    position: relative;
+    display: flex;
+    width: 280px;
+    height: 160px;
+    background: var(--ebony);
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    padding: 0 8px;
+    align-items: flex-end;
+    gap: 3px;
+    opacity: 0.4;
+  }
+  .key.white { flex: 1; height: 100%; background: #f5f5e8; border-radius: 0 0 4px 4px; }
+  .blacks { position: absolute; top: 0; left: 0; right: 0; display: flex; padding: 0 20px; gap: 0; }
+  .key.black { width: 24px; height: 96px; background: #111; border-radius: 0 0 4px 4px; flex-shrink: 0; margin: 0 4px; }
+  .gap { width: 24px; flex-shrink: 0; margin: 0 4px; }
+
+  /* lessons */
+  .lessons { padding: 6rem 6vw; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .lessons h2, .game-promo h2 { text-align: center; font-size: 2.4rem; margin-bottom: 0.5rem; }
+  .section-subtitle { text-align: center; color: var(--text-muted); font-size: 1.05rem; margin-bottom: 3rem; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.1); transform: translateY(-2px); }
+  .card.featured { border-color: var(--gold); box-shadow: 0 4px 24px rgba(201,168,76,0.15); }
+
+  .badge-popular {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--ebony);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 1rem;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .card-icon { font-size: 2.25rem; }
+  .card h3 { font-size: 1.35rem; }
+  .card p { color: var(--text-muted); line-height: 1.6; }
+  .card ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .card ul li::before { content: '✓ '; color: var(--gold); font-weight: 700; }
+  .card ul li { font-size: 0.9rem; color: var(--text-muted); }
+  .card .btn { margin-top: auto; text-align: center; }
+
+  /* game promo */
+  .game-promo {
+    background: linear-gradient(135deg, var(--ebony) 0%, #1a2744 100%);
+    padding: 5rem 6vw;
+  }
+
+  .promo-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .promo-text { max-width: 540px; }
+  .promo-text h2 { color: #fff; font-size: 2.2rem; margin-bottom: 1rem; }
+  .promo-text p { color: #a0aec0; font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.75rem; }
+
+  .promo-keys { font-size: 8rem; opacity: 0.15; flex-shrink: 0; }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; text-align: center; justify-content: center; padding: 3rem 1.5rem; }
+    .hero-actions { justify-content: center; }
+    .hero-visual { display: none; }
+    .promo-content { flex-direction: column; text-align: center; }
+    .promo-keys { display: none; }
+    .lessons, .game-promo { padding: 3.5rem 1.5rem; }
+  }
+</style>

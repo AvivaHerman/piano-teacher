@@ -1,0 +1,122 @@
+---
+interface Props {
+  title?: string;
+}
+const { title = 'Piano Teacher' } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | Piano Teacher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <nav>
+      <a href="/" class="logo">🎹 Piano Teacher</a>
+      <div class="nav-links">
+        <a href="/" class:list={[{ active: currentPath === '/' }]}>Home</a>
+        <a href="/book" class:list={[{ active: currentPath === '/book' }]}>Book a Lesson</a>
+        <a href="/play" class:list={[{ active: currentPath === '/play' }]}>Play Piano</a>
+      </div>
+    </nav>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>© 2026 Piano Teacher. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ivory: #FFFFF0;
+    --ebony: #1a1a2e;
+    --gold: #C9A84C;
+    --gold-light: #e8c96a;
+    --text: #2d2d2d;
+    --text-muted: #666;
+    --bg: #fafaf5;
+    --card-bg: #fff;
+    --border: #e0ddd4;
+    --radius: 12px;
+  }
+
+  html, body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main { flex: 1; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: var(--ebony);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .nav-links a {
+    color: #ccc;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-links a.active { color: var(--gold); background: rgba(201,168,76,0.12); }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    background: var(--ebony);
+    color: #888;
+  }
+
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  @media (max-width: 640px) {
+    nav { padding: 0.75rem 1rem; }
+    .logo { font-size: 1.1rem; }
+    .nav-links a { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+  }
+</style>

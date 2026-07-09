@@ -10,6 +10,7 @@ build/
 out/
 .nuxt/
 .output/
+.astro/
 
 # Environment files
 .env
